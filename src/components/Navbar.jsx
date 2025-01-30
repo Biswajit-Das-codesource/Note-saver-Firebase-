@@ -7,7 +7,10 @@ import { change } from "../redux/Slicer";
 function Navbar() {
 
     const value=useSelector((store)=>store.app.value)
-    console.log(value)
+
+    const user = useSelector((store)=>store.app.user)
+
+    console.log(user)
     const dispatch = useDispatch()
 
 

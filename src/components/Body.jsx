@@ -3,36 +3,38 @@ import { useSelector } from "react-redux";
 import NoteCard from "./NoteCard";
 import { IoMdCreate } from "react-icons/io";
 import Form from "./Form";
-import { MdCancel, MdOutlineCancel } from "react-icons/md";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { MdOutlineCancel } from "react-icons/md";
+import { collection, onSnapshot, query, doc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase";
 import Login from "./Login";
-import { current } from "@reduxjs/toolkit";
 
 function Body() {
   const user = useSelector((store) => store.app.user);
-
-  console.log(user)
-
   const theme = useSelector((store) => store.app.value);
-  // const user= useSelector((store)=>store.app.user)
   const [showForm, setShowForm] = useState(false); // Toggle form visibility
- 
+  const [notes, setNotes] = useState([]);
 
-  const [notes, setnotes] = useState([]);
   useEffect(() => {
     const q = query(collection(db, "notes"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notes = snapshot.docs.map((e) => ({ ...e.data(), id: e.id }));
-     const curnotes = auth.currentUser?.email  
-      const currentUser=notes.filter(e=>e.createdBy === curnotes)
-      console.log(currentUser)
-
-   
-      setnotes(currentUser);
+      const currentUserEmail = auth.currentUser?.email;
+      const currentUserNotes = notes.filter((e) => e.createdBy === currentUserEmail);
+      setNotes(currentUserNotes);
     });
+
+    return () => unsubscribe();
   }, []);
 
+  // Function to handle deleting the note
+  const handleDelete = async (noteId) => {
+    try {
+      await deleteDoc(doc(db, "notes", noteId));
+      console.log("Note deleted successfully");
+    } catch (err) {
+      console.error("Error deleting note: ", err);
+    }
+  };
 
   return (
     <>
@@ -42,16 +44,20 @@ function Body() {
         <div
           className={`h-screen w-full ${
             theme ? "bg-slate-950" : "bg-white"
-          } flex gap-14 flex-wrap overflow-y-auto scroll-smooth hide-scrollbar justify-center py-20 items-start snap-y snap-mandatory`}
+          } flex flex-col items-center py-16 px-4 overflow-x-hidden overflow-y-auto scroll-smooth`}
         >
-          {notes.map((e) => {
-            return <NoteCard value={e} />;
-          })}
+          {/* Notes Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+            {notes.map((e) => {
+              return <NoteCard key={e.id} value={e} onDelete={handleDelete} />;
+            })}
+          </div>
 
+          {/* Header Text */}
           <h1
-            className={`absolute top-60 left-[28%] text-8xl ${
+            className={`mt-10 text-center text-4xl md:text-6xl lg:text-7xl font-bold ${
               theme ? "text-slate-600" : "text-black"
-            } font-bold`}
+            } absolute`}
           >
             Keep it here.
           </h1>
@@ -59,16 +65,12 @@ function Body() {
           {/* Show Form if toggled */}
           {showForm && <Form setShowForm={setShowForm} />}
 
-          {/* Create Button to toggle form */}
+          {/* Create Button */}
           <button
             onClick={() => setShowForm(!showForm)}
-            className="text-black text-xl p-3 absolute bottom-11 right-14 bg-white rounded-full shadow-lg hover:scale-105 transition-all z-999"
+            className="fixed bottom-6 right-6 md:bottom-10 md:right-10 text-black text-xl p-3 bg-white rounded-full shadow-lg hover:scale-110 transition-all z-50"
           >
-            {showForm ? (
-              <MdOutlineCancel size={"2.5rem"} />
-            ) : (
-              <IoMdCreate size={"2.5rem"} />
-            )}
+            {showForm ? <MdOutlineCancel size={"2.5rem"} /> : <IoMdCreate size={"2.5rem"} />}
           </button>
         </div>
       )}

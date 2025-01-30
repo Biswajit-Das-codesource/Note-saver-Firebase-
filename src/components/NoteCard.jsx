@@ -2,7 +2,8 @@ import React from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { MdCancel } from "react-icons/md";
 
-function NoteCard({ value }) {
+function NoteCard({ value, onDelete }) {
+  
   // Function to handle the download of the note as a .txt file
   const handleDownload = () => {
     const noteContent = `Title: ${value.title}\n\nNote:\n${value.note}`;
@@ -24,7 +25,7 @@ function NoteCard({ value }) {
         </p>
       </div>
       <div className="items h-8 w-full flex gap-4 justify-end items-center px-4">
-        <MdCancel size={"1.5rem"} />
+        <MdCancel size={"1.5rem"} onClick={() => onDelete(value.id)} />
       </div>
       <div
         className="h-12 w-full bg-green-400 flex justify-center items-center cursor-pointer"
@@ -35,5 +36,6 @@ function NoteCard({ value }) {
     </div>
   );
 }
+
 
 export default NoteCard;
