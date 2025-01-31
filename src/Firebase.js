@@ -5,13 +5,7 @@ import { getFirestore } from "firebase/firestore";
 import { GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCHX14apuTAsn8EruJ9Fz3NUalaThG22vk",
-  authDomain: "notepad-3a8c4.firebaseapp.com",
-  projectId: "notepad-3a8c4",
-  storageBucket: "notepad-3a8c4.firebasestorage.app",
-  messagingSenderId: "365629989145",
-  appId: "1:365629989145:web:8690854874cb2b52186588",
-  measurementId: "G-8NXNN1QF54"
+ //handle your api 
 };
 
 // Initialize Firebase
